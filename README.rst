@@ -2,17 +2,12 @@ La caisse à outils du carnet de fusée à eau de Tonton Benoît
 ============================================================
 Ce projet rassemble les outils et ressources associées au "Carnet de fusée à eau de Tonton Benoît".
 
-+------------------------------+------------------------------+
-| .. image:: readme_attachments/pageGarde.jpg                 |
-|    :width: 300px                                           |
-|                                                            |
-|                                                            |
-+------------------------------+------------------------------+
-| .. image:: readme_attachments/preparation.jpg               |
-|    :width: 300px                                           |
-|                                                            |
-|                                                            |
-+------------------------------+------------------------------+
+.. raw:: html
+
+    <p align="center">
+        <img src="readme_attachments/pageGarde.jpg" width="300"/>
+        <img src="readme_attachments/preparation.jpg" width="300"/>
+    </p>
 
 Vous y trouverez:
 
