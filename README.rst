@@ -16,7 +16,7 @@ Vous y trouverez:
 * Un script python pour estimer le vol de la fusée à eau (altitude, vitesse, etc.)
 * autre...
 
-Les instructions sur le fonctionnement et la fabrication de la fusée sont disponible
+Les instructions sur le fonctionnement et la fabrication de la fusée sont disponibles
 dans "Le carnet de fusée à eau de Tonton Benoît", disponible à la vente sur Amazon.
 
 
