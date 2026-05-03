@@ -5,8 +5,8 @@ Ce projet rassemble les outils et ressources associées au "Carnet de fusée à 
 .. raw:: html
 
     <p align="center">
-        <img src="readme_attachments/pageGarde.jpg" width="300"/>
-        <img src="readme_attachments/preparation.jpg" width="300"/>
+        <img src="readme_attachments/pageGarde.JPG" width="300"/>
+        <img src="readme_attachments/preparation.JPG" width="300"/>
     </p>
 
 Vous y trouverez:
