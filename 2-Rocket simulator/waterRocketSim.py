@@ -13,27 +13,39 @@ from utilities import *
 # s1 water, s1 air, s2 water, s2 air
 # 0.12s, 0.265s, 0.945s, 2.26s 
 
-
-
 class WaterRocket():
-    def __init__(s1_waterVolumeIni = 0.001,
+    def __init__(self,
+                 s1_waterVolumeIni = 0.001,
                  s2_waterVolumeIni = 0.0015,
                  s1_noozleDiameter = 0.020,
                  s2_noozleDiameter = 0.007,
                  s1_bootleCount = 1,
                  s2_bootleCount = 2,
                  rocket_payloadMass = 0.2):
+        
+        self.s1_waterVolumeIni = s1_waterVolumeIni
+        self.s2_waterVolumeIni = s2_waterVolumeIni
+        self.s1_noozleDiameter = s1_noozleDiameter
+        self.s2_noozleDiameter = s2_noozleDiameter
+        self.s1_bootleCount = s1_bootleCount
+        self.s2_bootleCount = s2_bootleCount
+        self.rocket_payloadMass = rocket_payloadMass
+        self.bootleMass = CST_BOOTTLE_2L_MASS
 
-    def _waterExpulsionVelocity(pressure, nozzleDiameter, rocketDiameter):
-        """Compute the expulsion velocity of water from the rocket nozzle. Based on Bernoulli's equation or Torricelli's law.
+    def _waterExpulsionVelocity(self,
+                                pressure,
+                                nozzleDiameter,
+                                rocketDiameter):
+        """Compute the expulsion velocity of water from the rocket nozzle. Based on
+        Bernoulli's equation or Torricelli's law.
 
-        Parameters:
-        pressure (float): Pressure inside the rocket in Pascals.
-        nozzleDiameter (float): Diameter of the rocket nozzle in meters.
-        rocketDiameter (float): Diameter of the rocket in meters.
+        Args:
+            pressure (float): Pressure inside the rocket in Pascals.
+            nozzleDiameter (float): Diameter of the rocket nozzle in meters.
+            rocketDiameter (float): Diameter of the rocket in meters.
         
         Returns:
-        float: Expulsion velocity in meters per second.
+            float: Expulsion velocity in meters per second.
         """
         nozzleArea = circleArea(nozzleDiameter)
         rocketArea = circleArea(rocketDiameter)
@@ -45,41 +57,80 @@ class WaterRocket():
 
         return expulsionVelocity
 
-    def _airExpulsionMassFlowShocked(pressure, nozzleDiameter, restriction):
+    def _airExpulsionMassFlowShocked(self,
+                                     pressure,
+                                     nozzleDiameter,
+                                     restriction):
+        """Compute the mass flow of air expulsion from the rocket nozzle in case of
+        choked flow. Based on the choked flow law.
+
+        Args:
+            pressure (float): Pressure inside the rocket in Pascals.
+            nozzleDiameter (float): Diameter of the rocket nozzle in meters.
+            restriction (float): Flow restriction coefficient (between 0 and 1).
+        Returns:
+            float: Mass flow of air expulsion in kg/s.
+        """
         massFlow = 0
         nozzleArea = circleArea(nozzleDiameter)
         massFlow = restriction * nozzleArea * pressure * np.sqrt((CST_HEAT_CAPACITY_RATIO * CST_MASS_MOLAIRE_AIR) / (CST_PERFECT_GAS_CONSTANT * CST_AMBIANT_TEMPERATURE)) * ((2 / (CST_HEAT_CAPACITY_RATIO + 1)) ** ((CST_HEAT_CAPACITY_RATIO + 1) / (2 * (CST_HEAT_CAPACITY_RATIO - 1))))
         return massFlow
 
-    def _airExpulsionMassFlowIsentropic(pressure, nozzleDiameter, restriction):
+    def _airExpulsionMassFlowIsentropic(self,
+                                        pressure,
+                                        nozzleDiameter,
+                                        restriction):
+        """Compute the mass flow of air expulsion from the rocket nozzle in case of
+        isentropic flow. Based on the isentropic flow law.
+        
+        Args:
+            pressure (float): Pressure inside the rocket in Pascals.
+            nozzleDiameter (float): Diameter of the rocket nozzle in meters.
+            restriction (float): Flow restriction coefficient (between 0 and 1).
+        Returns:
+            float: Mass flow of air expulsion in kg/s.
+        """
         massFlow = 0
         nozzleArea = circleArea(nozzleDiameter)
         massFlow = restriction * nozzleArea * pressure * np.sqrt( ( 2 * CST_HEAT_CAPACITY_RATIO / ( ( CST_PERFECT_GAS_CONSTANT / CST_MASS_MOLAIRE_AIR ) * CST_AMBIANT_TEMPERATURE * ( CST_HEAT_CAPACITY_RATIO - 1 ) ) ) * ( ( ( CST_ATMOSPHERIC_PRESSURE / pressure ) ** ( 2 / CST_HEAT_CAPACITY_RATIO ) ) * ( 1 - (CST_ATMOSPHERIC_PRESSURE / pressure ) ** ( ( CST_HEAT_CAPACITY_RATIO - 1 ) / CST_HEAT_CAPACITY_RATIO ) ) ) ) 
         return massFlow
 
+    def _airExpulsionVelocityIsentropic(self,
+                                        pressure):
+        """Compute the expulsion velocity of air from the rocket nozzle in case of
+        isentropic flow.
 
-    def _airExpulsionVelocityIsentropic(pressure):
+        Args:
+            pressure (float): Pressure inside the rocket in Pascals.
+
+        Returns:
+            float: Expulsion velocity of air in meters per second.
+        """
         velocity = 0
         velocity = np.sqrt(((2 * CST_HEAT_CAPACITY_RATIO * (CST_PERFECT_GAS_CONSTANT / CST_MASS_MOLAIRE_AIR) * CST_AMBIANT_TEMPERATURE )/(CST_HEAT_CAPACITY_RATIO - 1))*(1 - ( CST_ATMOSPHERIC_PRESSURE / pressure )**((CST_HEAT_CAPACITY_RATIO -1)/CST_HEAT_CAPACITY_RATIO)))
         return velocity
 
     #Euler integration
-    def _eulerSimulation(s1_waterVolumeIni,
-                        s2_waterVolumeIni,
-                        s1_noozleDiameter,
-                        s2_noozleDiameter,
-                        s1_bootleCount,
-                        s2_bootleCount,
-                        rocket_payloadMass,
-                        simulation_step,
-                        simulation_time):
+    def _eulerSimulation(self,
+                         simulation_step,
+                         simulation_time):
         
-        noseConeEjected =False
-        
+        #Rocket properties
+        s1_waterVolumeIni = self.s1_waterVolumeIni
+        s2_waterVolumeIni = self.s2_waterVolumeIni
+        s1_noozleDiameter = self.s1_noozleDiameter
+        s2_noozleDiameter = self.s2_noozleDiameter
+        s1_bootleCount = self.s1_bootleCount
+        s2_bootleCount = self.s2_bootleCount
+        rocket_payloadMass = self.rocket_payloadMass
+
         #calculated properties
         s1_noozleSectionArea = circleArea(s1_noozleDiameter)
         s2_noozleSectionArea = circleArea(s2_noozleDiameter)
         rocket_sectionArea = circleArea(CST_ROCKET_DIAMETER)
+
+        #Rocket state
+        noseConeEjected =False
 
         rocket_emptyMass = 0
         if s2_bootleCount ==0:
