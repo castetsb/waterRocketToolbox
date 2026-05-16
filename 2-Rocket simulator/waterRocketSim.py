@@ -15,16 +15,13 @@ from utilities import *
 
 class WaterRocket():
     def __init__(self,
-                 s1_waterVolumeIni = 0.001,
-                 s2_waterVolumeIni = 0.0015,
+                 
                  s1_noozleDiameter = 0.020,
                  s2_noozleDiameter = 0.007,
                  s1_bootleCount = 1,
                  s2_bootleCount = 2,
                  rocket_payloadMass = 0.2):
         
-        self.s1_waterVolumeIni = s1_waterVolumeIni
-        self.s2_waterVolumeIni = s2_waterVolumeIni
         self.s1_noozleDiameter = s1_noozleDiameter
         self.s2_noozleDiameter = s2_noozleDiameter
         self.s1_bootleCount = s1_bootleCount
@@ -120,6 +117,8 @@ class WaterRocket():
         return emptyMass
     
     def _eulerSimulation(self,
+                         s1_waterVolumeIni = 0.001,
+                         s2_waterVolumeIni = 0.0015,
                          simulation_step,
                          simulation_time):
 
@@ -139,7 +138,9 @@ class WaterRocket():
         #Euler variables
         simulation_time = np.round(simulation_time/simulation_step)*simulation_step
 
-        #List to store simulation data
+        #################
+        #DATA CONTAINERS
+        #################
 
         t = np.arange(0, simulation_time + simulation_step, simulation_step)
         numberOfSteps = len(t)
@@ -208,7 +209,9 @@ class WaterRocket():
 
         total_downforce = np.zeros(numberOfSteps)
 
-        #initial conditions
+        ################
+        #INTITIALIZATION
+        ################
 
         #Static state variable
         #----------------------
@@ -257,7 +260,6 @@ class WaterRocket():
                 s2_thrustMode[0] = CST_THRUST_MODE_AIR_SHOCKED
             else:
                 s2_thrustMode[0] = CST_THRUST_MODE_OFF
-            
         
         rocket_noseConeRelease[0] = False
 
@@ -270,8 +272,8 @@ class WaterRocket():
         #Dynamic state variable
         #----------------------
 
-        s1_waterExpulsionVelocity[0] = _waterExpulsionVelocity(s1_pressure[0], s1_noozleDiameter, CST_ROCKET_DIAMETER) * (s1_thrustMode[0] == CST_THRUST_MODE_WATER)
-        s2_waterExpulsionVelocity[0] = _waterExpulsionVelocity(s2_pressure[0], s2_noozleDiameter, CST_ROCKET_DIAMETER) * (s2_thrustMode[0] == CST_THRUST_MODE_WATER)
+        s1_waterExpulsionVelocity[0] = self._waterExpulsionVelocity(s1_pressure[0], s1_noozleDiameter, CST_ROCKET_DIAMETER) * (s1_thrustMode[0] == CST_THRUST_MODE_WATER)
+        s2_waterExpulsionVelocity[0] = self._waterExpulsionVelocity(s2_pressure[0], s2_noozleDiameter, CST_ROCKET_DIAMETER) * (s2_thrustMode[0] == CST_THRUST_MODE_WATER)
 
         s1_waterExpulsionFlow[0] = s1_waterExpulsionVelocity[0] * s1_noozleSectionArea * CST_S1_waterFlowRestriction
         s2_waterExpulsionFlow[0] = s2_waterExpulsionVelocity[0] * s2_noozleSectionArea * CST_S2_waterFlowRestriction
@@ -285,8 +287,8 @@ class WaterRocket():
         s1_airExpulsionFlow[0] = s1_airExpulsionVelocity[0] * s1_noozleSectionArea
         s2_airExpulsionFlow[0] = s2_airExpulsionVelocity[0] * s2_noozleSectionArea
 
-        s1_airExpulsionMassFlow[0] = airExpulsionMassFlowShocked(s1_pressure[0], s1_noozleDiameter, CST_S1_airFlowRestriction) * (s1_thrustMode[0] == CST_THRUST_MODE_AIR_SHOCKED)
-        s2_airExpulsionMassFlow[0] = airExpulsionMassFlowShocked(s2_pressure[0], s1_noozleDiameter, CST_S2_airFlowRestriction) * (s2_thrustMode[0] == CST_THRUST_MODE_AIR_SHOCKED)
+        s1_airExpulsionMassFlow[0] = self._airExpulsionMassFlowShocked(s1_pressure[0], s1_noozleDiameter, CST_S1_airFlowRestriction) * (s1_thrustMode[0] == CST_THRUST_MODE_AIR_SHOCKED)
+        s2_airExpulsionMassFlow[0] = self._airExpulsionMassFlowShocked(s2_pressure[0], s2_noozleDiameter, CST_S2_airFlowRestriction) * (s2_thrustMode[0] == CST_THRUST_MODE_AIR_SHOCKED)
 
         #Force variables
         #---------------
