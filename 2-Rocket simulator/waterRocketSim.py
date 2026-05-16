@@ -110,39 +110,37 @@ class WaterRocket():
         velocity = np.sqrt(((2 * CST_HEAT_CAPACITY_RATIO * (CST_PERFECT_GAS_CONSTANT / CST_MASS_MOLAIRE_AIR) * CST_AMBIANT_TEMPERATURE )/(CST_HEAT_CAPACITY_RATIO - 1))*(1 - ( CST_ATMOSPHERIC_PRESSURE / pressure )**((CST_HEAT_CAPACITY_RATIO -1)/CST_HEAT_CAPACITY_RATIO)))
         return velocity
 
-    #Euler integration
+    def _rocketEmptyMass(self):
+        """Compute the empty mass of the rocket based on the number of bottles used and the payload mass.
+
+        Returns:
+            float: Empty mass of the rocket in kg.
+        """
+        emptyMass = self.rocket_payloadMass + (self.s1_bootleCount + self.s2_bootleCount) * self.bootleMass + CST_ROCKET_NOSE_CONE_MASS + CST_ROCKET_FIN_WEIGHT
+        return emptyMass
+    
     def _eulerSimulation(self,
                          simulation_step,
                          simulation_time):
-        
-        #Rocket properties
-        s1_waterVolumeIni = self.s1_waterVolumeIni
-        s2_waterVolumeIni = self.s2_waterVolumeIni
-        s1_noozleDiameter = self.s1_noozleDiameter
-        s2_noozleDiameter = self.s2_noozleDiameter
-        s1_bootleCount = self.s1_bootleCount
-        s2_bootleCount = self.s2_bootleCount
-        rocket_payloadMass = self.rocket_payloadMass
 
         #calculated properties
-        s1_noozleSectionArea = circleArea(s1_noozleDiameter)
-        s2_noozleSectionArea = circleArea(s2_noozleDiameter)
+        s1_noozleSectionArea = circleArea(self.s1_noozleDiameter)
+        s2_noozleSectionArea = circleArea(self.s2_noozleDiameter)
         rocket_sectionArea = circleArea(CST_ROCKET_DIAMETER)
 
         #Rocket state
         noseConeEjected =False
 
-        rocket_emptyMass = 0
-        if s2_bootleCount ==0:
-            rocket_emptyMass = CST_S1_BOOTLE_WEIGHT_SINGLE * s1_bootleCount + CST_ROCKET_NOSE_CONE_MASS + CST_ROCKET_FIN_WEIGHT + rocket_payloadMass
-        else:
-            rocket_emptyMass = CST_S1_BOOTLE_WEIGHT_DUAL * s1_bootleCount + CST_S2_BOOTLE_WEIGHT * s2_bootleCount + CST_ROCKET_NOSE_CONE_MASS + CST_ROCKET_FIN_WEIGHT + rocket_payloadMass
-        
-        s1_volume = CST_BOOTLE_VOLUME * s1_bootleCount
-        s2_volume = CST_BOOTLE_VOLUME * s2_bootleCount
+        rocket_emptyMass = self._rocketEmptyMass()
+
+        s1_volume = CST_BOOTLE_VOLUME * self.s1_bootleCount
+        s2_volume = CST_BOOTLE_VOLUME * self.s2_bootleCount
             
         #Euler variables
         simulation_time = np.round(simulation_time/simulation_step)*simulation_step
+
+        #List to store simulation data
+
         t = np.arange(0, simulation_time + simulation_step, simulation_step)
         numberOfSteps = len(t)
 
