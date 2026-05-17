@@ -15,19 +15,28 @@ from utilities import *
 
 class WaterRocket():
     def __init__(self,
-                 
                  s1_noozleDiameter = 0.020,
                  s2_noozleDiameter = 0.007,
-                 s1_bootleCount = 1,
-                 s2_bootleCount = 2,
+                 s1_bottleCount = 1,
+                 s2_bottleCount = 2,
+                 bottleType = CST_BOTTLE_TYPE_2L,
                  rocket_payloadMass = 0.2):
         
         self.s1_noozleDiameter = s1_noozleDiameter
         self.s2_noozleDiameter = s2_noozleDiameter
-        self.s1_bootleCount = s1_bootleCount
-        self.s2_bootleCount = s2_bootleCount
+        self.s1_bottleCount = s1_bottleCount
+        self.s2_bottleCount = s2_bottleCount
         self.rocket_payloadMass = rocket_payloadMass
-        self.bootleMass = CST_BOOTTLE_2L_MASS
+
+        self.bottleType = bottleType
+        if self.bottleType == CST_BOTTLE_TYPE_2L:
+            self.bottleMass = CST_BOTTLE_2L_MASS
+            self.bottleVolume = CST_BOTTLE_2L_VOLUME
+            self.bottleDiameter = CST_BOTTLE_2L_DIAMETER
+        elif self.bottleType == CST_BOTTLE_TYPE_1dot5L:
+            self.bottleMass = CST_BOTTLE_1dot5L_MASS
+            self.bottleVolume = CST_BOTTLE_1dot5L_VOLUME
+            self.bottleDiameter = CST_BOTTLE_1dot5L_DIAMETER
 
     def _waterExpulsionVelocity(self,
                                 pressure,
@@ -113,28 +122,46 @@ class WaterRocket():
         Returns:
             float: Empty mass of the rocket in kg.
         """
-        emptyMass = self.rocket_payloadMass + (self.s1_bootleCount + self.s2_bootleCount) * self.bootleMass + CST_ROCKET_NOSE_CONE_MASS + CST_ROCKET_FIN_WEIGHT
+        emptyMass = self.rocket_payloadMass + (self.s1_bottleCount + self.s2_bottleCount) * self.bottleMass + CST_ROCKET_NOSE_CONE_MASS + CST_ROCKET_FIN_WEIGHT
         return emptyMass
     
-    def _eulerSimulation(self,
+    def launchSimulation(self,
+                         simulation_step = 0.01,
+                         simulation_time = 5,
                          s1_waterVolumeIni = 0.001,
                          s2_waterVolumeIni = 0.0015,
-                         simulation_step,
-                         simulation_time):
+                         ):
+        """Simulate the launch of the water rocket using an Euler method to evaluate the
+        evolution of the rocket state (volume, mass, pressure, altitude) based on the
+        evolution of the expulsion flows and cinematic variables (speed, acceleration)
+        with the help of physics laws.
+
+        Args:
+            simulation_step (float): Time step for the Euler simulation in seconds.
+            simulation_time (float): Total time for the simulation in seconds.
+            s1_waterVolumeIni (float, optional): Initial water volume in section 1 in
+            cubic meters. Defaults to 0.001.
+            s2_waterVolumeIni (float, optional): Initial water volume in section 2 in
+            cubic meters. Defaults to 0.0015.
+        
+        Returns:
+            dict: A dictionary containing the evolution of the rocket state and
+            cinematic variables over time.
+        """
 
         #calculated properties
         s1_noozleSectionArea = circleArea(self.s1_noozleDiameter)
         s2_noozleSectionArea = circleArea(self.s2_noozleDiameter)
-        rocket_sectionArea = circleArea(CST_ROCKET_DIAMETER)
+        rocket_sectionArea = circleArea(self.bottleDiameter)
 
         #Rocket state
         noseConeEjected =False
 
         rocket_emptyMass = self._rocketEmptyMass()
 
-        s1_volume = CST_BOOTLE_VOLUME * self.s1_bootleCount
-        s2_volume = CST_BOOTLE_VOLUME * self.s2_bootleCount
-            
+        s1_volume = self.bottleVolume * self.s1_bottleCount
+        s2_volume = self.bottleVolume * self.s2_bottleCount
+
         #Euler variables
         simulation_time = np.round(simulation_time/simulation_step)*simulation_step
 
@@ -272,8 +299,8 @@ class WaterRocket():
         #Dynamic state variable
         #----------------------
 
-        s1_waterExpulsionVelocity[0] = self._waterExpulsionVelocity(s1_pressure[0], s1_noozleDiameter, CST_ROCKET_DIAMETER) * (s1_thrustMode[0] == CST_THRUST_MODE_WATER)
-        s2_waterExpulsionVelocity[0] = self._waterExpulsionVelocity(s2_pressure[0], s2_noozleDiameter, CST_ROCKET_DIAMETER) * (s2_thrustMode[0] == CST_THRUST_MODE_WATER)
+        s1_waterExpulsionVelocity[0] = self._waterExpulsionVelocity(s1_pressure[0], self.s1_noozleDiameter, self.bottleDiameter) * (s1_thrustMode[0] == CST_THRUST_MODE_WATER)
+        s2_waterExpulsionVelocity[0] = self._waterExpulsionVelocity(s2_pressure[0], self.s2_noozleDiameter, self.bottleDiameter) * (s2_thrustMode[0] == CST_THRUST_MODE_WATER)
 
         s1_waterExpulsionFlow[0] = s1_waterExpulsionVelocity[0] * s1_noozleSectionArea * CST_S1_waterFlowRestriction
         s2_waterExpulsionFlow[0] = s2_waterExpulsionVelocity[0] * s2_noozleSectionArea * CST_S2_waterFlowRestriction
@@ -287,8 +314,8 @@ class WaterRocket():
         s1_airExpulsionFlow[0] = s1_airExpulsionVelocity[0] * s1_noozleSectionArea
         s2_airExpulsionFlow[0] = s2_airExpulsionVelocity[0] * s2_noozleSectionArea
 
-        s1_airExpulsionMassFlow[0] = self._airExpulsionMassFlowShocked(s1_pressure[0], s1_noozleDiameter, CST_S1_airFlowRestriction) * (s1_thrustMode[0] == CST_THRUST_MODE_AIR_SHOCKED)
-        s2_airExpulsionMassFlow[0] = self._airExpulsionMassFlowShocked(s2_pressure[0], s2_noozleDiameter, CST_S2_airFlowRestriction) * (s2_thrustMode[0] == CST_THRUST_MODE_AIR_SHOCKED)
+        s1_airExpulsionMassFlow[0] = self._airExpulsionMassFlowShocked(s1_pressure[0], self.s1_noozleDiameter, CST_S1_airFlowRestriction) * (s1_thrustMode[0] == CST_THRUST_MODE_AIR_SHOCKED)
+        s2_airExpulsionMassFlow[0] = self._airExpulsionMassFlowShocked(s2_pressure[0], self.s2_noozleDiameter, CST_S2_airFlowRestriction) * (s2_thrustMode[0] == CST_THRUST_MODE_AIR_SHOCKED)
 
         #Force variables
         #---------------
@@ -418,8 +445,8 @@ class WaterRocket():
             ####################################################################################################################
 
             # Update water expulsion velocities based on Bernoulli's equation or Torricelli's law.
-            s1_waterExpulsionVelocity[i] = _waterExpulsionVelocity(s1_pressure[i], CST_S1_NOOZLE_DIAMETER, CST_ROCKET_DIAMETER) * (s1_thrustMode[i] == CST_THRUST_MODE_WATER)
-            s2_waterExpulsionVelocity[i] = _waterExpulsionVelocity(s2_pressure[i], s2_noozleDiameter, CST_ROCKET_DIAMETER) * (s2_thrustMode[i] == CST_THRUST_MODE_WATER)
+            s1_waterExpulsionVelocity[i] = self._waterExpulsionVelocity(s1_pressure[i], CST_S1_NOOZLE_DIAMETER, self.bottleDiameter) * (s1_thrustMode[i] == CST_THRUST_MODE_WATER)
+            s2_waterExpulsionVelocity[i] = self._waterExpulsionVelocity(s2_pressure[i], self.s2_noozleDiameter, self.bottleDiameter) * (s2_thrustMode[i] == CST_THRUST_MODE_WATER)
 
             # Update water expulsion flows
             s1_waterExpulsionFlow[i] = s1_waterExpulsionVelocity[i] * s1_noozleSectionArea * CST_S1_waterFlowRestriction
@@ -435,9 +462,9 @@ class WaterRocket():
                 s2_waterExpulsionMassFlow[i] = 0
             
             # Update air expulsion velocities based on choked flow law
-            s1_airExpulsionVelocity[i] = CST_AIR_THROAT_VELOCITY * (s1_thrustMode[i] == CST_THRUST_MODE_AIR_SHOCKED) + airExpulsionVelocityIsentropic(s1_pressure[i]) * (s1_thrustMode[i] == CST_THRUST_MODE_AIR_ISENTROPIC)
+            s1_airExpulsionVelocity[i] = CST_AIR_THROAT_VELOCITY * (s1_thrustMode[i] == CST_THRUST_MODE_AIR_SHOCKED) + self._airExpulsionVelocityIsentropic(s1_pressure[i]) * (s1_thrustMode[i] == CST_THRUST_MODE_AIR_ISENTROPIC)
             if s2_volume > 0:
-                s2_airExpulsionVelocity[i] = CST_AIR_THROAT_VELOCITY  * (s2_thrustMode[i] == CST_THRUST_MODE_AIR_SHOCKED) + airExpulsionVelocityIsentropic(s2_pressure[i]) * (s2_thrustMode[i] == CST_THRUST_MODE_AIR_ISENTROPIC)
+                s2_airExpulsionVelocity[i] = CST_AIR_THROAT_VELOCITY  * (s2_thrustMode[i] == CST_THRUST_MODE_AIR_SHOCKED) + self._airExpulsionVelocityIsentropic(s2_pressure[i]) * (s2_thrustMode[i] == CST_THRUST_MODE_AIR_ISENTROPIC)
             else:
                 s2_airExpulsionVelocity[i] = 0
             s1_airExpulsionFlow[i] = s1_airExpulsionVelocity[i] * s1_noozleSectionArea
@@ -445,9 +472,9 @@ class WaterRocket():
                 s2_airExpulsionFlow[i] = s2_airExpulsionVelocity[i] * s2_noozleSectionArea
             else:
                 s2_airExpulsionFlow[i] = 0
-            s1_airExpulsionMassFlow[i] = airExpulsionMassFlowShocked(s1_pressure[i],s1_noozleDiameter, CST_S1_airFlowRestriction) * (s1_thrustMode[i] == CST_THRUST_MODE_AIR_SHOCKED) + airExpulsionMassFlowIsentropic(s1_pressure[i], s1_noozleDiameter, CST_S1_airFlowRestriction) * (s1_thrustMode[i] == CST_THRUST_MODE_AIR_ISENTROPIC)
+            s1_airExpulsionMassFlow[i] = self._airExpulsionMassFlowShocked(s1_pressure[i], self.s1_noozleDiameter, CST_S1_airFlowRestriction) * (s1_thrustMode[i] == CST_THRUST_MODE_AIR_SHOCKED) + self._airExpulsionMassFlowIsentropic(s1_pressure[i], self.s1_noozleDiameter, CST_S1_airFlowRestriction) * (s1_thrustMode[i] == CST_THRUST_MODE_AIR_ISENTROPIC)
             if s2_volume > 0:
-                s2_airExpulsionMassFlow[i] = airExpulsionMassFlowShocked(s2_pressure[i],s2_noozleDiameter, CST_S2_airFlowRestriction) * (s2_thrustMode[i] == CST_THRUST_MODE_AIR_SHOCKED) + airExpulsionMassFlowIsentropic(s2_pressure[i], s2_noozleDiameter, CST_S2_airFlowRestriction) * (s2_thrustMode[i] == CST_THRUST_MODE_AIR_ISENTROPIC)
+                s2_airExpulsionMassFlow[i] = self._airExpulsionMassFlowShocked(s2_pressure[i], self.s2_noozleDiameter, CST_S2_airFlowRestriction) * (s2_thrustMode[i] == CST_THRUST_MODE_AIR_SHOCKED) + self._airExpulsionMassFlowIsentropic(s2_pressure[i], self.s2_noozleDiameter, CST_S2_airFlowRestriction) * (s2_thrustMode[i] == CST_THRUST_MODE_AIR_ISENTROPIC)
             else:
                 s2_airExpulsionMassFlow[i] = 0
             #Force variables
@@ -731,26 +758,6 @@ class WaterRocket():
         ax.set_title('Max Altitude vs S1/S2 Water Volumes for Different S2 Nozzle Diameters')
         plt.tight_layout()
         plt.show()
-
-    #Example of use
-    ################
-
-    flyParameters = eulerSimulation(
-        s1_waterVolumeIni=0.001,#0.001, #best 1
-        s2_waterVolumeIni=0.0015,#0.0015, # best 1.5
-        s1_noozleDiameter=0.020, 
-        s2_noozleDiameter=0.007, 
-        s1_bootleCount=1,
-        s2_bootleCount=2,#2,
-        rocket_payloadMass=0.200,
-        simulation_step=0.01,
-        simulation_time=20
-    )
-
-
-    print("maxAltitude :",maxAltitude(flyParameters))
-    print("timeToMaxAltitude :",timeToMaxAltitude(flyParameters))
-    print("flyTime :",flyTime(flyParameters))
 
     def plot_flight_diagnostics(flyParameters):
         """Plot altitude, thrusts, speed, and acceleration vs time in a 2x2 grid."""
