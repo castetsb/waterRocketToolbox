@@ -22,6 +22,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 import os
+from constants import *
        
 class TestSoftware(unittest.TestCase):
     """Test utils functions."""
@@ -37,8 +38,21 @@ class TestSoftware(unittest.TestCase):
         pass
 
     def test_1(self):
-        rocket=wrs.WaterRocket()
+        rocket=wrs.WaterRocket(s1_nozzleDiameter = 0.020,
+                 s2_nozzleDiameter = 0.007,
+                 s1_bottleCount = 1,
+                 s2_bottleCount = 2,
+                 bottleType = CST_BOTTLE_TYPE_1dot5L,
+                 rocket_payloadMass = 0)
+        best=rocket.parametersForMaxAltitude(
+                                 s1_waterVolumeIni_range=np.arange(0.0005, 0.001, 0.0001),
+                                 s2_waterVolumeIni_range=np.arange(0.0005, 0.002, 0.0001),
+                                 simulation_step=0.01,
+                                 simulation_time=20
+                                 )
+        print(best)
         flyParameters = rocket.launchSimulation()
+        rocket.plot_flight_diagnostics(flyParameters)
 
         print("\nTest 1: dfsghstfhsfthfgh")
         #self.assertEqual()

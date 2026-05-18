@@ -15,15 +15,15 @@ from utilities import *
 
 class WaterRocket():
     def __init__(self,
-                 s1_noozleDiameter = 0.020,
-                 s2_noozleDiameter = 0.007,
+                 s1_nozzleDiameter = 0.020,
+                 s2_nozzleDiameter = 0.007,
                  s1_bottleCount = 1,
                  s2_bottleCount = 2,
                  bottleType = CST_BOTTLE_TYPE_2L,
                  rocket_payloadMass = 0.2):
         
-        self.s1_noozleDiameter = s1_noozleDiameter
-        self.s2_noozleDiameter = s2_noozleDiameter
+        self.s1_nozzleDiameter = s1_nozzleDiameter
+        self.s2_nozzleDiameter = s2_nozzleDiameter
         self.s1_bottleCount = s1_bottleCount
         self.s2_bottleCount = s2_bottleCount
         self.rocket_payloadMass = rocket_payloadMass
@@ -37,6 +37,7 @@ class WaterRocket():
             self.bottleMass = CST_BOTTLE_1dot5L_MASS
             self.bottleVolume = CST_BOTTLE_1dot5L_VOLUME
             self.bottleDiameter = CST_BOTTLE_1dot5L_DIAMETER
+        
 
     def _waterExpulsionVelocity(self,
                                 pressure,
@@ -150,8 +151,8 @@ class WaterRocket():
         """
 
         #calculated properties
-        s1_noozleSectionArea = circleArea(self.s1_noozleDiameter)
-        s2_noozleSectionArea = circleArea(self.s2_noozleDiameter)
+        s1_nozzleSectionArea = circleArea(self.s1_nozzleDiameter)
+        s2_nozzleSectionArea = circleArea(self.s2_nozzleDiameter)
         rocket_sectionArea = circleArea(self.bottleDiameter)
 
         #Rocket state
@@ -299,11 +300,11 @@ class WaterRocket():
         #Dynamic state variable
         #----------------------
 
-        s1_waterExpulsionVelocity[0] = self._waterExpulsionVelocity(s1_pressure[0], self.s1_noozleDiameter, self.bottleDiameter) * (s1_thrustMode[0] == CST_THRUST_MODE_WATER)
-        s2_waterExpulsionVelocity[0] = self._waterExpulsionVelocity(s2_pressure[0], self.s2_noozleDiameter, self.bottleDiameter) * (s2_thrustMode[0] == CST_THRUST_MODE_WATER)
+        s1_waterExpulsionVelocity[0] = self._waterExpulsionVelocity(s1_pressure[0], self.s1_nozzleDiameter, self.bottleDiameter) * (s1_thrustMode[0] == CST_THRUST_MODE_WATER)
+        s2_waterExpulsionVelocity[0] = self._waterExpulsionVelocity(s2_pressure[0], self.s2_nozzleDiameter, self.bottleDiameter) * (s2_thrustMode[0] == CST_THRUST_MODE_WATER)
 
-        s1_waterExpulsionFlow[0] = s1_waterExpulsionVelocity[0] * s1_noozleSectionArea * CST_S1_waterFlowRestriction
-        s2_waterExpulsionFlow[0] = s2_waterExpulsionVelocity[0] * s2_noozleSectionArea * CST_S2_waterFlowRestriction
+        s1_waterExpulsionFlow[0] = s1_waterExpulsionVelocity[0] * s1_nozzleSectionArea * CST_S1_waterFlowRestriction
+        s2_waterExpulsionFlow[0] = s2_waterExpulsionVelocity[0] * s2_nozzleSectionArea * CST_S2_waterFlowRestriction
 
         s1_waterExpulsionMassFlow[0] = s1_waterExpulsionFlow[0] * CST_WATER_DENSITY
         s2_waterExpulsionMassFlow[0] = s2_waterExpulsionFlow[0] * CST_WATER_DENSITY
@@ -311,11 +312,11 @@ class WaterRocket():
         s1_airExpulsionVelocity[0] = CST_AIR_THROAT_VELOCITY * (s1_thrustMode[0] == CST_THRUST_MODE_AIR_SHOCKED)
         s2_airExpulsionVelocity[0] = CST_AIR_THROAT_VELOCITY * (s2_thrustMode[0] == CST_THRUST_MODE_AIR_SHOCKED)
 
-        s1_airExpulsionFlow[0] = s1_airExpulsionVelocity[0] * s1_noozleSectionArea
-        s2_airExpulsionFlow[0] = s2_airExpulsionVelocity[0] * s2_noozleSectionArea
+        s1_airExpulsionFlow[0] = s1_airExpulsionVelocity[0] * s1_nozzleSectionArea
+        s2_airExpulsionFlow[0] = s2_airExpulsionVelocity[0] * s2_nozzleSectionArea
 
-        s1_airExpulsionMassFlow[0] = self._airExpulsionMassFlowShocked(s1_pressure[0], self.s1_noozleDiameter, CST_S1_airFlowRestriction) * (s1_thrustMode[0] == CST_THRUST_MODE_AIR_SHOCKED)
-        s2_airExpulsionMassFlow[0] = self._airExpulsionMassFlowShocked(s2_pressure[0], self.s2_noozleDiameter, CST_S2_airFlowRestriction) * (s2_thrustMode[0] == CST_THRUST_MODE_AIR_SHOCKED)
+        s1_airExpulsionMassFlow[0] = self._airExpulsionMassFlowShocked(s1_pressure[0], self.s1_nozzleDiameter, CST_S1_airFlowRestriction) * (s1_thrustMode[0] == CST_THRUST_MODE_AIR_SHOCKED)
+        s2_airExpulsionMassFlow[0] = self._airExpulsionMassFlowShocked(s2_pressure[0], self.s2_nozzleDiameter, CST_S2_airFlowRestriction) * (s2_thrustMode[0] == CST_THRUST_MODE_AIR_SHOCKED)
 
         #Force variables
         #---------------
@@ -425,7 +426,7 @@ class WaterRocket():
                 rocket_noseConeRelease[i] = True
             elif (rocket_altitude[i-1] > rocket_altitude[i]) and not rocket_noseConeRelease[i-1]:
                 rocket_noseConeRelease[i] = True
-                rocket_emptyMass = rocket_emptyMass - rocket_payloadMass - CST_ROCKET_NOSE_CONE_MASS
+                rocket_emptyMass = rocket_emptyMass - self.rocket_payloadMass - CST_ROCKET_NOSE_CONE_MASS
             else:
                 rocket_noseConeRelease[i] = False
 
@@ -445,13 +446,13 @@ class WaterRocket():
             ####################################################################################################################
 
             # Update water expulsion velocities based on Bernoulli's equation or Torricelli's law.
-            s1_waterExpulsionVelocity[i] = self._waterExpulsionVelocity(s1_pressure[i], CST_S1_NOOZLE_DIAMETER, self.bottleDiameter) * (s1_thrustMode[i] == CST_THRUST_MODE_WATER)
-            s2_waterExpulsionVelocity[i] = self._waterExpulsionVelocity(s2_pressure[i], self.s2_noozleDiameter, self.bottleDiameter) * (s2_thrustMode[i] == CST_THRUST_MODE_WATER)
+            s1_waterExpulsionVelocity[i] = self._waterExpulsionVelocity(s1_pressure[i], self.s1_nozzleDiameter, self.bottleDiameter) * (s1_thrustMode[i] == CST_THRUST_MODE_WATER)
+            s2_waterExpulsionVelocity[i] = self._waterExpulsionVelocity(s2_pressure[i], self.s2_nozzleDiameter, self.bottleDiameter) * (s2_thrustMode[i] == CST_THRUST_MODE_WATER)
 
             # Update water expulsion flows
-            s1_waterExpulsionFlow[i] = s1_waterExpulsionVelocity[i] * s1_noozleSectionArea * CST_S1_waterFlowRestriction
+            s1_waterExpulsionFlow[i] = s1_waterExpulsionVelocity[i] * s1_nozzleSectionArea * CST_S1_waterFlowRestriction
             if s2_volume > 0:
-                s2_waterExpulsionFlow[i] = s2_waterExpulsionVelocity[i] * s2_noozleSectionArea * CST_S2_waterFlowRestriction
+                s2_waterExpulsionFlow[i] = s2_waterExpulsionVelocity[i] * s2_nozzleSectionArea * CST_S2_waterFlowRestriction
             else:
                 s2_waterExpulsionFlow[i] = 0
 
@@ -467,14 +468,14 @@ class WaterRocket():
                 s2_airExpulsionVelocity[i] = CST_AIR_THROAT_VELOCITY  * (s2_thrustMode[i] == CST_THRUST_MODE_AIR_SHOCKED) + self._airExpulsionVelocityIsentropic(s2_pressure[i]) * (s2_thrustMode[i] == CST_THRUST_MODE_AIR_ISENTROPIC)
             else:
                 s2_airExpulsionVelocity[i] = 0
-            s1_airExpulsionFlow[i] = s1_airExpulsionVelocity[i] * s1_noozleSectionArea
+            s1_airExpulsionFlow[i] = s1_airExpulsionVelocity[i] * s1_nozzleSectionArea
             if s2_volume > 0:
-                s2_airExpulsionFlow[i] = s2_airExpulsionVelocity[i] * s2_noozleSectionArea
+                s2_airExpulsionFlow[i] = s2_airExpulsionVelocity[i] * s2_nozzleSectionArea
             else:
                 s2_airExpulsionFlow[i] = 0
-            s1_airExpulsionMassFlow[i] = self._airExpulsionMassFlowShocked(s1_pressure[i], self.s1_noozleDiameter, CST_S1_airFlowRestriction) * (s1_thrustMode[i] == CST_THRUST_MODE_AIR_SHOCKED) + self._airExpulsionMassFlowIsentropic(s1_pressure[i], self.s1_noozleDiameter, CST_S1_airFlowRestriction) * (s1_thrustMode[i] == CST_THRUST_MODE_AIR_ISENTROPIC)
+            s1_airExpulsionMassFlow[i] = self._airExpulsionMassFlowShocked(s1_pressure[i], self.s1_nozzleDiameter, CST_S1_airFlowRestriction) * (s1_thrustMode[i] == CST_THRUST_MODE_AIR_SHOCKED) + self._airExpulsionMassFlowIsentropic(s1_pressure[i], self.s1_nozzleDiameter, CST_S1_airFlowRestriction) * (s1_thrustMode[i] == CST_THRUST_MODE_AIR_ISENTROPIC)
             if s2_volume > 0:
-                s2_airExpulsionMassFlow[i] = self._airExpulsionMassFlowShocked(s2_pressure[i], self.s2_noozleDiameter, CST_S2_airFlowRestriction) * (s2_thrustMode[i] == CST_THRUST_MODE_AIR_SHOCKED) + self._airExpulsionMassFlowIsentropic(s2_pressure[i], self.s2_noozleDiameter, CST_S2_airFlowRestriction) * (s2_thrustMode[i] == CST_THRUST_MODE_AIR_ISENTROPIC)
+                s2_airExpulsionMassFlow[i] = self._airExpulsionMassFlowShocked(s2_pressure[i], self.s2_nozzleDiameter, CST_S2_airFlowRestriction) * (s2_thrustMode[i] == CST_THRUST_MODE_AIR_SHOCKED) + self._airExpulsionMassFlowIsentropic(s2_pressure[i], self.s2_nozzleDiameter, CST_S2_airFlowRestriction) * (s2_thrustMode[i] == CST_THRUST_MODE_AIR_ISENTROPIC)
             else:
                 s2_airExpulsionMassFlow[i] = 0
             #Force variables
@@ -555,7 +556,8 @@ class WaterRocket():
         return flyVariables
 
 
-    def maxAltitude(flyVariables):
+    def maxAltitude(self,
+                    flyVariables):
         """    Calculate the maximum altitude reached by the rocket.
 
         Parameters:
@@ -565,7 +567,8 @@ class WaterRocket():
         """
         return np.max(flyVariables["rocket_altitude"])
 
-    def timeToMaxAltitude(flyVariables):
+    def timeToMaxAltitude(self,
+                          flyVariables):
         """Calculate the time taken to reach the maximum altitude.
         Parameters:
         flyVariables (dict): Dictionary containing the simulation results.
@@ -575,7 +578,8 @@ class WaterRocket():
         max_altitude_index = np.argmax(flyVariables["rocket_altitude"])
         return max_altitude_index * (flyVariables["time"][1] - flyVariables["time"][0])
 
-    def flyTime(flyVariables):
+    def flyTime(self,
+                flyVariables):
         """Calculate the total flight time until the rocket lands.
         
         Parameters:
@@ -585,7 +589,8 @@ class WaterRocket():
         """
         return np.sum(flyVariables["rocket_altitude"] > 0) * 0.01
 
-    def _simulationStep(flyVariables):
+    def _simulationStep(self,
+                        flyVariables):
         """Calculate the simulation step used in the simulation.
         
         Parameters:
@@ -595,7 +600,7 @@ class WaterRocket():
         """
         return flyVariables["time"][1] - flyVariables["time"][0]
 
-    def _simulationTime(flyVariables):
+    def _simulationTime(self,flyVariables):
         """Calculate the total simulation time.
         
         Parameters:
@@ -605,15 +610,12 @@ class WaterRocket():
         """
         return flyVariables["time"][-1]
 
-    def parametersForMaxAltitude(
-        payload_mass,
-        s1_bootleCount=1,
-        s2_bottleCount=2,
-        s1_noozleDiameter_range=np.arange(0.010, 0.021, 0.001),
-        s2_nozzleDiameter_range=np.arange(0.005, 0.011, 0.001),
-        s1_waterVolumeIni_range=np.arange(0.0005, 0.001, 0.0001),
-        s2_waterVolumeIni_range=np.arange(0.0005, 0.002, 0.0001),
-    ):
+    def parametersForMaxAltitude(self,
+                                 s1_waterVolumeIni_range=np.arange(0.0005, 0.001, 0.0001),
+                                 s2_waterVolumeIni_range=np.arange(0.0005, 0.002, 0.0001),
+                                 simulation_step=0.01,
+                                 simulation_time=20
+                                 ):
         """Calculate the parameters for maximum altitude.
         
         Parameters:
@@ -627,48 +629,40 @@ class WaterRocket():
         dict: Dictionary containing the parameters for maximum altitude.
         """
         maxAltitude_value = 0
-        best_s1_noozleDiameter = 0
+        best_s1_nozzleDiameter = 0
         best_s2_nozzleDiameter = 0
         best_s1_waterVolumeIni = 0
         best_s2_waterVolumeIni = 0
-        for s1_nozzleDiameter in s1_noozleDiameter_range:
-            for s2_nozzleDiameter in s2_nozzleDiameter_range:
-                for s1_waterVolumeIni in s1_waterVolumeIni_range:
-                    for s2_waterVolumeIni in s2_waterVolumeIni_range:
-                        flyParameters = eulerSimulation(
-                            s1_waterVolumeIni=s1_waterVolumeIni,
-                            s2_waterVolumeIni=s2_waterVolumeIni,
-                            s1_noozleDiameter=s1_nozzleDiameter,
-                            s2_noozleDiameter=s2_nozzleDiameter,
-                            s1_bootleCount=s1_bootleCount,
-                            s2_bootleCount=s2_bottleCount,
-                            rocket_payloadMass=payload_mass,
-                            simulation_step=0.01,
-                            simulation_time=20
-                        )
-                        altitude = maxAltitude(flyParameters)
-                        if altitude > maxAltitude_value:
-                            maxAltitude_value = altitude
-                            best_s1_noozleDiameter = s1_nozzleDiameter
-                            best_s2_nozzleDiameter = s2_nozzleDiameter
-                            best_s1_waterVolumeIni = s1_waterVolumeIni
-                            best_s2_waterVolumeIni = s2_waterVolumeIni
+        for s1_waterVolumeIni in s1_waterVolumeIni_range:
+            for s2_waterVolumeIni in s2_waterVolumeIni_range:
+                flyParameters = self.launchSimulation(
+                    s1_waterVolumeIni=s1_waterVolumeIni,
+                    s2_waterVolumeIni=s2_waterVolumeIni,
+                    simulation_step=simulation_step,
+                    simulation_time=simulation_time)
+                altitude = self.maxAltitude(flyParameters)
+                if altitude > maxAltitude_value:
+                    maxAltitude_value = altitude
+                    best_s1_nozzleDiameter = self.s1_nozzleDiameter
+                    best_s2_nozzleDiameter = self.s2_nozzleDiameter
+                    best_s1_waterVolumeIni = s1_waterVolumeIni
+                    best_s2_waterVolumeIni = s2_waterVolumeIni
         
         return {
-            "s1_nozzleDiameter": best_s1_noozleDiameter,
+            "s1_nozzleDiameter": best_s1_nozzleDiameter,
             "s2_nozzleDiameter": best_s2_nozzleDiameter,
             "s1_waterVolumeIni": best_s1_waterVolumeIni,
             "s2_waterVolumeIni": best_s2_waterVolumeIni,
             "maxAltitude": maxAltitude_value
         }
 
-    def parametersForMaxTime(
-        payload_mass,
-        s2_bottleCount=2,
-        s2_nozzleDiameter_range=np.arange(0.005, 0.011, 0.001),
-        s1_waterVolumeIni_range=np.arange(0.0005, 0.001, 0.0001),
-        s2_waterVolumeIni_range=np.arange(0.0005, 0.002, 0.0001),
-    ):
+    def parametersForMaxTime(self,
+                             payload_mass,
+                             s2_bottleCount=2,
+                             s2_nozzleDiameter_range=np.arange(0.005, 0.011, 0.001),
+                             s1_waterVolumeIni_range=np.arange(0.0005, 0.001, 0.0001),
+                             s2_waterVolumeIni_range=np.arange(0.0005, 0.002, 0.0001),
+                             ):
         """Calculate the parameters for maximum altitude.
         
         Parameters:
@@ -691,13 +685,13 @@ class WaterRocket():
                     flyParameters = eulerSimulation(
                         s1_waterVolumeIni=s1_waterVolumeIni,
                         s2_waterVolumeIni=s2_waterVolumeIni,
-                        s2_noozleDiameter=s2_nozzleDiameter,
-                        s2_bootleCount=s2_bottleCount,
+                        s2_nozzleDiameter=s2_nozzleDiameter,
+                        s2_bottleCount=s2_bottleCount,
                         rocket_payloadMass=payload_mass,
                         simulation_step=0.01,
                         simulation_time=10
                     )
-                    time = flyTime(flyParameters)
+                    time = self.flyTime(flyParameters)
                     if time > maxTime_value:
                         maxTime_value = time
                         best_s2_nozzleDiameter = s2_nozzleDiameter
@@ -710,46 +704,46 @@ class WaterRocket():
             "s2_waterVolumeIni": best_s2_waterVolumeIni
         }
 
-    def plot_max_altitude_3d_with_s2_nozzle(
-        s1_volume,
-        s2_volume,
-        s1_noozleDiameter,
-        s2_noozleDiameter_range,  # tuple: (min, max)
-        s2_noozleDiameter_steps,  # int: number of increments
-        rocket_emptyMass,
-        rocket_payloadMass,
-        rocket_dragCoeficient,
-        rocket_diameter,
-        launch_Pressure
-    ):
+    def plot_max_altitude_3d_with_s2_nozzle(self,
+                                            s1_volume,
+                                            s2_volume,
+                                            s1_nozzleDiameter,
+                                            s2_nozzleDiameter_range,  # tuple: (min, max)
+                                            s2_nozzleDiameter_steps,  # int: number of increments
+                                            rocket_emptyMass,
+                                            rocket_payloadMass,
+                                            rocket_dragCoeficient,
+                                            rocket_diameter,
+                                            launch_Pressure
+                                            ):
 
         s1_volumes = np.linspace(0, s1_volume, 20)
         s2_volumes = np.linspace(0, s2_volume, 20)
-        s2_noozleDiameters = np.linspace(s2_noozleDiameter_range[0], s2_noozleDiameter_range[1], s2_noozleDiameter_steps)
+        s2_nozzleDiameters = np.linspace(s2_nozzleDiameter_range[0], s2_nozzleDiameter_range[1], s2_nozzleDiameter_steps)
 
         S1, S2 = np.meshgrid(s1_volumes, s2_volumes)
         fig = plt.figure(figsize=(8, 6))
         ax = fig.add_subplot(111, projection='3d')
 
         # Use a colormap for different nozzle diameters
-        colors = cm.viridis(np.linspace(0, 1, s2_noozleDiameter_steps))
+        colors = cm.viridis(np.linspace(0, 1, s2_nozzleDiameter_steps))
 
-        for idx, (s2_noozleDiameter, color) in enumerate(zip(s2_noozleDiameters, colors)):
+        for idx, (s2_nozzleDiameter, color) in enumerate(zip(s2_nozzleDiameters, colors)):
             max_altitude = np.zeros_like(S1)
             for i in range(S1.shape[0]):
                 for j in range(S1.shape[1]):
                     result = eulerSimulation(
                         launch_Pressure,
-                        s1_volume, S1[i, j], s1_noozleDiameter,
-                        s2_volume, S2[i, j], s2_noozleDiameter,
+                        s1_volume, S1[i, j], s1_nozzleDiameter,
+                        s2_volume, S2[i, j], s2_nozzleDiameter,
                         rocket_emptyMass, rocket_payloadMass, rocket_dragCoeficient, rocket_diameter
                     )
                     max_altitude[i, j] = np.max(result["rocket_altitude"])
             # Plot as dots instead of surface
-            ax.scatter(S1, S2, max_altitude, color=color, label=f'{s2_noozleDiameter:.3f} m', alpha=0.7, s=10)
+            ax.scatter(S1, S2, max_altitude, color=color, label=f'{s2_nozzleDiameter:.3f} m', alpha=0.7, s=10)
 
         # Create custom legend
-        legend_patches = [Patch(color=colors[i], label=f'S2 Nozzle: {s2_noozleDiameters[i]:.3f} m') for i in range(s2_noozleDiameter_steps)]
+        legend_patches = [Patch(color=colors[i], label=f'S2 Nozzle: {s2_nozzleDiameters[i]:.3f} m') for i in range(s2_nozzleDiameter_steps)]
         ax.legend(handles=legend_patches, loc='upper left', bbox_to_anchor=(1.05, 1))
 
         ax.set_xlabel('S1 Water Volume (m³)')
@@ -759,11 +753,12 @@ class WaterRocket():
         plt.tight_layout()
         plt.show()
 
-    def plot_flight_diagnostics(flyParameters):
+    def plot_flight_diagnostics(self,
+                                flyParameters):
         """Plot altitude, thrusts, speed, and acceleration vs time in a 2x2 grid."""
         time = flyParameters["time"]
-        inAirTime = flyTime(flyParameters)
-        maxAltTime = timeToMaxAltitude(flyParameters)
+        inAirTime = self.flyTime(flyParameters)
+        maxAltTime = self.timeToMaxAltitude(flyParameters)
         fig, axs = plt.subplots(3, 3, figsize=(14, 10))
 
         # Altitude vs Time
@@ -881,7 +876,8 @@ class WaterRocket():
         fig.canvas.manager.full_screen_toggle()  # Toggle fullscreen once
         plt.show()
 
-    def plot_altitudeVsTime(flyParameters):
+    def plot_altitudeVsTime(self,
+                            flyParameters):
         """Plot the altitude of the rocket over time."""
         plt.figure(figsize=(10, 6))
         plt.plot(np.arange(0, simulationTime(flyParameters) + simulationStep(flyParameters), simulationStep(flyParameters)), flyParameters["rocket_altitude"], label='Rocket Altitude', color='blue')
@@ -894,9 +890,9 @@ class WaterRocket():
     """
     bestAltitudeParatemers = parametersForMaxAltitude(
         payload_mass=0.300,
-        s1_bootleCount=1,
+        s1_bottleCount=1,
         s2_bottleCount=2,
-        s1_noozleDiameter_range=np.array([0.020]),
+        s1_nozzleDiameter_range=np.array([0.020]),
         s2_nozzleDiameter_range=np.array([0.007]),
         s1_waterVolumeIni_range=np.linspace(0.0005, 0.001, 6),
         s2_waterVolumeIni_range=np.linspace(0.0005, 0.002, 16),
@@ -939,7 +935,8 @@ class WaterRocket():
 
     #plot_flight_diagnostics(flyParameters)
 
-    def animate_rocket_launch(flyParameters):
+    def animate_rocket_launch(self,
+                              flyParameters):
         # Pygame setup
         pygame.init()
         width, height = 400, 600
@@ -1020,7 +1017,8 @@ class WaterRocket():
 
     # To run the animation after diagnostics plot:
     #animate_rocket_launch(flyParameters)
-    def plot_altitude_and_thrust(flyParameters):
+    def plot_altitude_and_thrust(self,
+                                 flyParameters):
         """Plot altitude (left y-axis) and total thrust (right y-axis) vs time."""
         time = flyParameters["time"]
         altitude = flyParameters["rocket_altitude"]
@@ -1071,7 +1069,9 @@ class WaterRocket():
         plt.show()
     #plot_altitude_and_thrust(flyParameters)
 
-    def save_flyparameters_to_csv(flyParameters, filename="rocket_simulation.csv"):
+    def save_flyparameters_to_csv(self,
+                                  flyParameters,
+                                  filename="rocket_simulation.csv"):
         """Save flyParameters dictionary to a CSV file.
         
         Parameters:
