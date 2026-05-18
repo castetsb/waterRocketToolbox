@@ -10,9 +10,9 @@ Welcome to Water Rocket Toolbox Documentation
    :maxdepth: 2
    :caption: Contents:
 
-   Home <home>
+   Water Rocket Toolbox <Introduction>
    The book <book>
-   The CAD <cad>
+   The CADs <cad>
    The Simulator <simulator>
 
 Indices and tables
