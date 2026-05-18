@@ -1,6 +1,11 @@
-La caisse à outils du carnet de fusée à eau de Tonton Benoît
-============================================================
-Ce projet rassemble les outils et ressources associées au "Carnet de fusée à eau de Tonton Benoît".
+Water Rocket Tool Box
+=====================
+
+.. list-table::
+   :align: center
+   :class: borderless
+
+**Toolbox to design, build and fly water rockets**
 
 .. raw:: html
 
@@ -9,18 +14,19 @@ Ce projet rassemble les outils et ressources associées au "Carnet de fusée à 
         <img src="readme_attachments/preparation.JPG" width="300"/>
     </p>
 
-Vous y trouverez:
+You will find:
 
-* Les dessins paramétriques 3D des pièces de la fusée (FreeCAD, STEP, STL)
-* La mise en plan 2D des pièces (FreeCAD, PDF)
-* Un script python pour estimer le vol de la fusée à eau (altitude, vitesse, etc.)
-* autre...
+* The parametric 3D drawings of the rocket parts (FreeCAD, STEP, STL)
+* The 2D layout of the parts (FreeCAD, PDF)
+* A Python script to estimate the water rocket flight (altitude, speed, etc.)
+* Other...
 
-Les instructions sur le fonctionnement et la fabrication de la fusée sont disponibles
-dans "Le carnet de fusée à eau de Tonton Benoît", disponible à la vente sur Amazon.
+The instructions for the operation and construction of the rocket are available
+in "Le carnet de fusée à eau de Tonton Benoît", available for purchase on Amazon.
 
+#Documentation: `Water Rocket Tool Box Documentation <https://waterrockettoolbox.readthedocs.io/en/latest/>`_
 
-
-
-
-
+.. warning::
+    Water rocket involve high pressure and can be dangerous if not handled properly.
+    Always follow safety guidelines and use appropriate protective equipment when building
+    and flying water rockets.
