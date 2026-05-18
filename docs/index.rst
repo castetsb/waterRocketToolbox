@@ -5,13 +5,10 @@
 
 
 
-
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   Water Rocket Toolbox <introduction>
    The book <book>
    The CADs <cad>
    The Simulator <simulator>
