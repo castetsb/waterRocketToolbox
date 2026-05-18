@@ -3,17 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Water Rocket Toolbox Documentation
-==========================================
+
+
+
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   Water Rocket Toolbox <Introduction>
+   Water Rocket Toolbox <introduction>
    The book <book>
    The CADs <cad>
    The Simulator <simulator>
+
+.. include:: ../README.rst
 
 Indices and tables
 ==================
