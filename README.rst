@@ -10,8 +10,8 @@ Water Rocket Tool Box
 .. raw:: html
 
     <p align="center">
-        <img src="readme_attachments/pageGarde.JPG" width="300"/>
-        <img src="readme_attachments/preparation.JPG" width="300"/>
+        <img src="/readme_attachments/pageGarde.JPG" width="300"/>
+        <img src="/readme_attachments/preparation.JPG" width="300"/>
     </p>
 
 You will find:
