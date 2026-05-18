@@ -30,3 +30,11 @@ in "Le carnet de fusée à eau de Tonton Benoît", available for purchase on Ama
     Water rocket involve high pressure and can be dangerous if not handled properly.
     Always follow safety guidelines and use appropriate protective equipment when building
     and flying water rockets.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   The book <book>
+   The CADs <cad>
+   The Simulator <simulator>
