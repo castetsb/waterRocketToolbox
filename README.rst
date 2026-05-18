@@ -10,8 +10,8 @@ Water Rocket Tool Box
 .. raw:: html
 
     <p align="center">
-        <img src="https://github.com/castetsb/waterRocketToolbox/blob/main/docs/_static/pageGarde.JPG" width="300"/>
-        <img src="https://github.com/castetsb/waterRocketToolbox/blob/main/docs/_static/preparation.JPG" width="300"/>
+        <img src="https://raw.githubusercontent.com/castetsb/waterRocketToolbox/refs/heads/main/docs/_static/pageGarde.JPG" width="300"/>
+        <img src="https://raw.githubusercontent.com/castetsb/waterRocketToolbox/refs/heads/main/docs/_static/preparation.JPG" width="300"/>
     </p>
 
 You will find:
