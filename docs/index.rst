@@ -5,3 +5,10 @@
 
 .. include:: ../README.rst
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   The book <book>
+   The CADs <cad>
+   The Simulator <simulator>
