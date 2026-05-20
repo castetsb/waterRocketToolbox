@@ -8,7 +8,7 @@ CAD section : Under construction
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
     <model-viewer 
-        src="_static/my_model.glb" 
+        src="_static/rocket.glb" 
         alt="3D model"
         auto-rotate 
         camera-controls 
