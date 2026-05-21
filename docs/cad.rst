@@ -27,7 +27,7 @@ Quater cut view of the water rocket on its launcher
 .. raw:: html
 
     <div class="sketchfab-embed-wrapper">
-        <iframe title="Bottle"
+        <iframe title="Launcher"
             width="100%"
             height="480"
             frameborder="0"
