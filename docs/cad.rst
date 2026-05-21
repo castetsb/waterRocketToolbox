@@ -14,6 +14,6 @@ CAD section : Under construction
             mozallowfullscreen="true"
             webkitallowfullscreen="true"
             allow="autoplay; fullscreen; xr-spatial-tracking"
-            src="https://sketchfab.com/models/af7d1224548a4c8d844127c081394744/embed">
+            src="https://sketchfab.com/models/d6bc7d4b2ed442a99fc211ee140671cf/embed">
         </iframe>
     </div>
