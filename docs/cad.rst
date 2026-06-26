@@ -1,6 +1,19 @@
 The CADs
 ========
 
+The rocket parts are designed in FreeCAD. The CAD data is available in the
+A-Design data folder.
+
+A-Design data
+!---Launcher
+!---Rocket
+    !---Assembly CAD
+    !---Drawings
+    !---Parts CAD
+    !---PET bootle data
+    !---STL
+
+
 CAD section : Under construction
 
 Quater cut view of the water rocket
