@@ -30,4 +30,3 @@ https://waterrockettoolbox.readthedocs.io/en/latest/
     Water rocket involve high pressure and can be dangerous if not handled properly.
     Always follow safety guidelines and use appropriate protective equipment when building
     and flying water rockets.
-
