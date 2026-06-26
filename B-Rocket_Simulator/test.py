@@ -24,7 +24,7 @@ from scipy.stats import norm
 import os
 from constants import *
        
-class TestSoftware(unittest.TestCase):
+class Software(unittest.TestCase):
     """Test utils functions."""
     @classmethod
     def setUpClass(cls):

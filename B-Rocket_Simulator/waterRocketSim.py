@@ -1,3 +1,9 @@
+"""Utilities for simulating a water rocket flight.
+
+The module exposes the :class:`WaterRocket` model and helper routines that
+compute expulsion flow, thrust, and trajectory over time.
+"""
+
 #Import libaries
 import numpy as np
 from matplotlib import cm
@@ -14,6 +20,12 @@ from utilities import *
 # 0.12s, 0.265s, 0.945s, 2.26s 
 
 class WaterRocket():
+    """Model a water rocket and simulate its flight.
+
+    The class stores bottle, nozzle, and payload parameters and provides the
+    :meth:`launchSimulation` method to evaluate the rocket trajectory.
+    """
+
     def __init__(self,
                  s1_nozzleDiameter = 0.020,
                  s2_nozzleDiameter = 0.007,
@@ -21,7 +33,16 @@ class WaterRocket():
                  s2_bottleCount = 2,
                  bottleType = CST_BOTTLE_TYPE_2L,
                  rocket_payloadMass = 0.2):
-        
+        """Initialize the water rocket model.
+
+        Args:
+            s1_nozzleDiameter (float): Nozzle diameter for section 1 in meters.
+            s2_nozzleDiameter (float): Nozzle diameter for section 2 in meters.
+            s1_bottleCount (int): Number of bottles in section 1.
+            s2_bottleCount (int): Number of bottles in section 2.
+            bottleType (str): Constant that identifies the bottle type.
+            rocket_payloadMass (float): Payload mass in kilograms.
+        """
         self.s1_nozzleDiameter = s1_nozzleDiameter
         self.s2_nozzleDiameter = s2_nozzleDiameter
         self.s1_bottleCount = s1_bottleCount
@@ -558,22 +579,25 @@ class WaterRocket():
 
     def maxAltitude(self,
                     flyVariables):
-        """    Calculate the maximum altitude reached by the rocket.
+        """Calculate the maximum altitude reached by the rocket.
 
-        Parameters:
-        flyVariables (dict): Dictionary containing the simulation results.
+        Args:
+            flyVariables (dict): Dictionary containing the simulation results.
+
         Returns:
-        float: Maximum altitude reached by the rocket.
+            float: Maximum altitude reached by the rocket.
         """
         return np.max(flyVariables["rocket_altitude"])
 
     def timeToMaxAltitude(self,
                           flyVariables):
         """Calculate the time taken to reach the maximum altitude.
-        Parameters:
-        flyVariables (dict): Dictionary containing the simulation results.
+
+        Args:
+            flyVariables (dict): Dictionary containing the simulation results.
+
         Returns:
-        float: Time taken to reach the maximum altitude.
+            float: Time taken to reach the maximum altitude.
         """
         max_altitude_index = np.argmax(flyVariables["rocket_altitude"])
         return max_altitude_index * (flyVariables["time"][1] - flyVariables["time"][0])
@@ -581,32 +605,35 @@ class WaterRocket():
     def flyTime(self,
                 flyVariables):
         """Calculate the total flight time until the rocket lands.
-        
-        Parameters:
-        flyVariables (dict): Dictionary containing the simulation results.
+
+        Args:
+            flyVariables (dict): Dictionary containing the simulation results.
+
         Returns:
-        float: Total flight time until the rocket lands.
+            float: Total flight time until the rocket lands.
         """
         return np.sum(flyVariables["rocket_altitude"] > 0) * 0.01
 
     def _simulationStep(self,
                         flyVariables):
         """Calculate the simulation step used in the simulation.
-        
-        Parameters:
-        flyVariables (dict): Dictionary containing the simulation results.
+
+        Args:
+            flyVariables (dict): Dictionary containing the simulation results.
+
         Returns:
-        float: Simulation step used in the simulation.
+            float: Simulation step used in the simulation.
         """
         return flyVariables["time"][1] - flyVariables["time"][0]
 
     def _simulationTime(self,flyVariables):
         """Calculate the total simulation time.
-        
-        Parameters:
-        flyVariables (dict): Dictionary containing the simulation results.
+
+        Args:
+            flyVariables (dict): Dictionary containing the simulation results.
+
         Returns:
-        float: Total simulation time.
+            float: Total simulation time implemented in the simulation.
         """
         return flyVariables["time"][-1]
 
@@ -616,17 +643,16 @@ class WaterRocket():
                                  simulation_step=0.01,
                                  simulation_time=20
                                  ):
-        """Calculate the parameters for maximum altitude.
-        
-        Parameters:
-        payload_mass (float): Mass of the payload in kg.
-        s2_bottleCount (int): Number of S2 bottles.
-        s2_nozzle_range (np.ndarray): Range of S2 nozzle diameters.
-        s1_waterVolumeIni_range (np.ndarray): Range of initial S1 water volumes.
-        s2_waterVolumeIni_range (np.ndarray): Range of initial S2 water volumes.
-        
+        """Search for the initial water volumes that maximize altitude.
+
+        Args:
+            s1_waterVolumeIni_range (np.ndarray): Range of initial S1 water volumes.
+            s2_waterVolumeIni_range (np.ndarray): Range of initial S2 water volumes.
+            simulation_step (float): Time step for the simulation in seconds.
+            simulation_time (float): Total simulation duration in seconds.
+
         Returns:
-        dict: Dictionary containing the parameters for maximum altitude.
+            dict: Best parameters for maximum altitude and the associated altitude.
         """
         maxAltitude_value = 0
         best_s1_nozzleDiameter = 0
@@ -663,17 +689,17 @@ class WaterRocket():
                              s1_waterVolumeIni_range=np.arange(0.0005, 0.001, 0.0001),
                              s2_waterVolumeIni_range=np.arange(0.0005, 0.002, 0.0001),
                              ):
-        """Calculate the parameters for maximum altitude.
-        
-        Parameters:
-        payload_mass (float): Mass of the payload in kg.
-        s2_bottleCount (int): Number of S2 bottles.
-        s2_nozzle_range (np.ndarray): Range of S2 nozzle diameters.
-        s1_waterVolumeIni_range (np.ndarray): Range of initial S1 water volumes.
-        s2_waterVolumeIni_range (np.ndarray): Range of initial S2 water volumes.
-        
+        """Search for the parameters that maximize flight time.
+
+        Args:
+            payload_mass (float): Mass of the payload in kg.
+            s2_bottleCount (int): Number of S2 bottles.
+            s2_nozzleDiameter_range (np.ndarray): Range of S2 nozzle diameters.
+            s1_waterVolumeIni_range (np.ndarray): Range of initial S1 water volumes.
+            s2_waterVolumeIni_range (np.ndarray): Range of initial S2 water volumes.
+
         Returns:
-        dict: Dictionary containing the parameters for maximum altitude.
+            dict: Best parameters for maximum flight time.
         """
         maxTime_value = 0
         best_s2_nozzleDiameter = 0
@@ -716,6 +742,20 @@ class WaterRocket():
                                             rocket_diameter,
                                             launch_Pressure
                                             ):
+        """Plot maximum altitude as a 3D surface for S1/S2 water volumes and S2 nozzle diameter.
+
+        Args:
+            s1_volume (float): Total volume available in section 1 in cubic meters.
+            s2_volume (float): Total volume available in section 2 in cubic meters.
+            s1_nozzleDiameter (float): Nozzle diameter for section 1 in meters.
+            s2_nozzleDiameter_range (tuple): Minimum and maximum S2 nozzle diameters.
+            s2_nozzleDiameter_steps (int): Number of nozzle diameter increments to evaluate.
+            rocket_emptyMass (float): Empty mass of the rocket in kilograms.
+            rocket_payloadMass (float): Payload mass in kilograms.
+            rocket_dragCoeficient (float): Drag coefficient of the rocket.
+            rocket_diameter (float): Diameter of the rocket in meters.
+            launch_Pressure (float): Launch pressure in Pascals.
+        """
 
         s1_volumes = np.linspace(0, s1_volume, 20)
         s2_volumes = np.linspace(0, s2_volume, 20)
@@ -755,7 +795,11 @@ class WaterRocket():
 
     def plot_flight_diagnostics(self,
                                 flyParameters):
-        """Plot altitude, thrusts, speed, and acceleration vs time in a 2x2 grid."""
+        """Plot flight diagnostics including altitude, thrust, speed, acceleration, and mass history.
+
+        Args:
+            flyParameters (dict): Simulation results dictionary returned by :meth:`launchSimulation`.
+        """
         time = flyParameters["time"]
         inAirTime = self.flyTime(flyParameters)
         maxAltTime = self.timeToMaxAltitude(flyParameters)
@@ -878,7 +922,11 @@ class WaterRocket():
 
     def plot_altitudeVsTime(self,
                             flyParameters):
-        """Plot the altitude of the rocket over time."""
+        """Plot the altitude of the rocket over time.
+
+        Args:
+            flyParameters (dict): Simulation results dictionary returned by :meth:`launchSimulation`.
+        """
         plt.figure(figsize=(10, 6))
         plt.plot(np.arange(0, simulationTime(flyParameters) + simulationStep(flyParameters), simulationStep(flyParameters)), flyParameters["rocket_altitude"], label='Rocket Altitude', color='blue')
         plt.title('Rocket Altitude vs Time')
@@ -937,6 +985,11 @@ class WaterRocket():
 
     def animate_rocket_launch(self,
                               flyParameters):
+        """Animate the rocket launch using Pygame.
+
+        Args:
+            flyParameters (dict): Simulation results dictionary returned by :meth:`launchSimulation`.
+        """
         # Pygame setup
         pygame.init()
         width, height = 400, 600
@@ -1019,7 +1072,11 @@ class WaterRocket():
     #animate_rocket_launch(flyParameters)
     def plot_altitude_and_thrust(self,
                                  flyParameters):
-        """Plot altitude (left y-axis) and total thrust (right y-axis) vs time."""
+        """Plot altitude and total thrust versus time on dual y-axes.
+
+        Args:
+            flyParameters (dict): Simulation results dictionary returned by :meth:`launchSimulation`.
+        """
         time = flyParameters["time"]
         altitude = flyParameters["rocket_altitude"]
         thrust = flyParameters["total_thrust"]
@@ -1072,11 +1129,11 @@ class WaterRocket():
     def save_flyparameters_to_csv(self,
                                   flyParameters,
                                   filename="rocket_simulation.csv"):
-        """Save flyParameters dictionary to a CSV file.
-        
-        Parameters:
-        flyParameters (dict): Dictionary containing the simulation results.
-        filename (str): Name of the Excel file to save (default: "rocket_simulation.xlsx").
+        """Save simulation results to a CSV file.
+
+        Args:
+            flyParameters (dict): Dictionary containing the simulation results.
+            filename (str): Path to the CSV file to write.
         """
         
         # Create a DataFrame from flyParameters

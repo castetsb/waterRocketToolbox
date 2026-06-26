@@ -12,12 +12,13 @@ import sys
 
 # Get the project root dir, which is the parent dir of this
 cwd = os.getcwd()
-project_root = os.path.dirname(cwd)
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+simulator_dir = os.path.join(project_root, "B-Rocket_Simulator")
 
-# Insert the project root dir as the first element in the PYTHONPATH.
-# This lets us ensure that the source package is imported, and that its
-# version is used.
+# Insert the project root dir and the simulator package directory into the
+# PYTHONPATH so autodoc can import the module reliably.
 sys.path.insert(0, project_root)
+sys.path.insert(0, simulator_dir)
 #from 2-Rocket_Simulator import __version__, __author__, __project__
 
 
@@ -52,8 +53,8 @@ autodoc_typehints_format = 'short'
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-# build even without pandas or numpy
-autodoc_mock_imports = ["pandas", "numpy", "pygame", "pynput", "pyautogui" ]
+# build even without optional runtime dependencies
+autodoc_mock_imports = ["pandas", "numpy", "pygame", "pynput", "pyautogui", "matplotlib" ]
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
